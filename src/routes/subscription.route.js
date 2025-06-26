@@ -10,9 +10,9 @@ const router = Router();
 
 router.use(verifyJwt);
 
-router.route('/subscribe:channelId',SubscribeToChannel);
-router.route('/unsubscribe:channelId',UnSubscribeToChannel);
-router.route('/channel-subscribers',getChannelSubscribers);
-router.route('/channels-subscribed-to',getChannelsSubscribedTo);
+router.route('/subscribe/:channelId').post(SubscribeToChannel);
+router.route('/unsubscribe/:channelId').post(UnSubscribeToChannel);
+router.route('/channel-subscribers').get(getChannelSubscribers);
+router.route('/channels-subscribed-to').get(getChannelsSubscribedTo);
 
 export default router;

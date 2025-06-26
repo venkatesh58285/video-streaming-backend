@@ -260,7 +260,7 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
    //sending mess to frontend as well in pipelines
    //return res
 
-   const username = req.params;
+   const {username} = req.params;
    if(!username) throw new ApiError(400,'username is missing')
    
    const channel =await User.aggregate(
@@ -289,10 +289,10 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
          {
             $addFields:{
                subscribersCount:{
-                  $size: "$subscibers"
+                  $size: {$ifNull:["$subscibers",[]]}
                },
                subscribedTosCount:{
-                  $size: "$subscibedTo"
+                  $size: {$ifNull:["$subscibedTo",[]]}
                },
                isSubscribed:{
                   $cond:{
@@ -319,7 +319,7 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
          }
       ]
    )
-    if (!profile?.length) {
+    if (!channel?.length) {
         throw new ApiError(404, "channel does not exists")
     }
 

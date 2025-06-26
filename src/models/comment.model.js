@@ -9,10 +9,10 @@ const commentSchema =new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"Video"
     },
-    owner:{
+    owner:{ 
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }
 },{timestamps:true})
 
-export const Comments = mongoose.model('Comment',commentSchema)
+export const Comment = mongoose.model('Comment',commentSchema)

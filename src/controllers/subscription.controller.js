@@ -2,15 +2,16 @@ import {asyncHandler} from '../utils/asyncHandler.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
 import {ApiError} from '../utils/ApiError.js';
 import {Subscription} from '../models/subscription.model.js';
+import mongoose from "mongoose";
 
 const SubscribeToChannel = asyncHandler(async(req,res)=>{
     const userId = req.user._id;
     const channelId = req.params.channelId;
     if(String(userId) == String(channelId)) throw new ApiError(400,'Subscribe to own channel is prohibited')
     if(!channelId) throw new ApiError(400,'Channel not found')
-    const info = await Subscription.findOne({subscriber:userId,owner:channelId})
+    const info = await Subscription.findOne({subscriber:userId,channel:channelId})
     if(info) throw new ApiError(400,"Already subscibed")
-    const details = await Subscription.create({subscriber:userId,owner:channelId})
+    const details = await Subscription.create({subscriber:userId,channel:channelId})
     return res
     .status(200)
     .json(
@@ -22,9 +23,9 @@ const UnSubscribeToChannel = asyncHandler(async(req,res)=>{
     const userId = req.user._id;
     const channelId = req.params.channelId;
     if(!channelId) throw new ApiError(400,'Channel not found')
-    const info = await Subscription.findOne({subscriber:userId,owner:channelId})
+    const info = await Subscription.findOne({subscriber:userId,channel:channelId})
     if(!info) throw new ApiError(400,"Not subscibed")
-    const deleted = await Subscription.findOneAndDelete({subscriber:userId,owner:channelId})
+    const deleted = await Subscription.findOneAndDelete({subscriber:userId,channel:channelId})
     if(!deleted) throw new ApiError(404,"unable to delete")
     return res
     .status(200)
@@ -37,7 +38,8 @@ const getChannelSubscribers = asyncHandler(async(req,res)=>{
     const user = req.user._id;
     // const subscribers = Subscription.find({user}).populate("subscriber","username email");
     // if(!subscribers?.length) throw new ApiError(404,"User not found")
-    const pipelines = Subscription.aggregate([
+    // console.log(user);
+    const pipelines =await Subscription.aggregate([
         {
             $match: {
                 channel:user
@@ -51,14 +53,14 @@ const getChannelSubscribers = asyncHandler(async(req,res)=>{
                 as:"subscribers"
             }
         },
+        {$unwind:"$subscribers"},
         {
             $project:{
-                username:1,
-                fullName:1,
-                email:1,
+                "subscribers":1
             }
         }
-    ])
+    ]);
+    // console.log(pipelines)
     if(!pipelines?.length){
         throw new ApiError(400,'Subscribers not found')
     }
@@ -72,7 +74,7 @@ const getChannelSubscribers = asyncHandler(async(req,res)=>{
 
 const getChannelsSubscribedTo = asyncHandler(async(req,res)=>{
      const user = req.user._id;
-     const pipelines = Subscription.aggregate([
+     const pipelines =await Subscription.aggregate([
         {
             $match: {
                 subscriber:user
@@ -86,18 +88,17 @@ const getChannelsSubscribedTo = asyncHandler(async(req,res)=>{
                 as:"subscribedTo"
             }
         },
+        {$unwind:"$subscribedTo"},
         {
-            project:{
-                username:1,
-                fullName:1,
-                email:1,
+            $project:{
+               "subscribedTo":1
             }
         }
     ])
     return res
     .status(200)
     .json(
-        new ApiResponse(200,pipelines,"Got all subscribers")
+        new ApiResponse(200,pipelines,"Got all channels subscribed to")
     )
 
 })
