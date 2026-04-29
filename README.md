@@ -127,13 +127,21 @@ http://localhost:8000
 
 ---
 
+## 🏗️ System Architecture
+
+<img width="800" height="533" alt="image" src="https://github.com/user-attachments/assets/07b84e0b-365c-4261-965b-8a37fde1cb01" />
+
+
+---
+
 ## 🗄️ Database Architecture
 
 View full database design:  
 👉 https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj  
 
----
+<img width="800" height="533" alt="image" src="https://github.com/user-attachments/assets/126f10d8-b955-4f0a-8288-9a5ccba32054" /> 
 
+---
 ## 🔄 Authentication Flow
 
 - Access Token (short-lived)  
